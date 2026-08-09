@@ -1,7 +1,9 @@
 const CLIENT_ID = import.meta.env.VITE_SPOTIFY_CLIENT_ID as string | undefined
-const REDIRECT_URI =
-  (import.meta.env.VITE_SPOTIFY_REDIRECT_URI as string | undefined) ??
-  `${window.location.origin}/callback`
+
+/** Siempre la origen actual → evita mismatch con variables de entorno mal puestas */
+function getRedirectUri(): string {
+  return `${window.location.origin}/callback`
+}
 
 const SCOPES = [
   'streaming',
@@ -77,7 +79,7 @@ export async function beginLogin(): Promise<void> {
   const params = new URLSearchParams({
     client_id: CLIENT_ID,
     response_type: 'code',
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: getRedirectUri(),
     scope: SCOPES,
     code_challenge_method: 'S256',
     code_challenge: challenge,
@@ -97,7 +99,7 @@ export async function exchangeCodeForToken(code: string): Promise<SpotifyToken> 
     client_id: CLIENT_ID,
     grant_type: 'authorization_code',
     code,
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: getRedirectUri(),
     code_verifier: verifier,
   })
 
